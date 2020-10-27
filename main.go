@@ -12,13 +12,13 @@ import (
 
 func init() {
 	for x := 0; x < settings.ScreenWidth; x++ {
-		particles.GetDataXY(x, 0).PType = particles.Solid
-		particles.GetDataXY(x, settings.ScreenHeight-1).PType = particles.Solid
+		*particles.GetDataXY(x, 0) = particles.NewRock()
+		*particles.GetDataXY(x, settings.ScreenHeight-1) = particles.NewRock()
 	}
 
 	for y := 0; y < settings.ScreenHeight; y++ {
-		particles.GetDataXY(0, y).PType = particles.Solid
-		particles.GetDataXY(settings.ScreenWidth-1, y).PType = particles.Solid
+		*particles.GetDataXY(0, y) = particles.NewRock()
+		*particles.GetDataXY(settings.ScreenWidth-1, y) = particles.NewRock()
 	}
 }
 

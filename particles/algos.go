@@ -15,6 +15,7 @@ const (
 	Fire
 	WaterVapor
 	Smoke
+	Rock
 	Solid
 	OOB
 )
