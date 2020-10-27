@@ -5,6 +5,13 @@ import (
 	"math/rand"
 )
 
+func randomWaterColor() color.RGBA {
+	max := 256
+	min := 230
+	rc := uint8(rand.Intn(max-min) + min)
+	return color.RGBA{0, 0, rc, 255}
+}
+
 func NewRock() Particle {
 	max := 150
 	min := 120
@@ -20,7 +27,7 @@ func NewSand() Particle {
 	max := 220
 	min := 180
 	rc := uint8(rand.Intn(max-min) + min)
-	return Particle{PType: Water,
+	return Particle{PType: Sand,
 		Updated: false,
 		VelX:    0,
 		VelY:    0,
@@ -28,12 +35,9 @@ func NewSand() Particle {
 }
 
 func NewWater() Particle {
-	max := 256
-	min := 230
-	rc := uint8(rand.Intn(max-min) + min)
 	return Particle{PType: Water,
 		Updated: false,
 		VelX:    0,
 		VelY:    0,
-		Color:   color.RGBA{0, 0, rc, 255}}
+		Color:   randomWaterColor()}
 }
