@@ -72,7 +72,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func main() {
 	// ebiten.SetMaxTPS(15)
 	ebiten.SetWindowSize(settings.ScreenWidth*settings.Scale, settings.ScreenHeight*settings.Scale)
-	ebiten.SetWindowTitle("Paint (Ebiten Demo)")
+	ebiten.SetWindowTitle("sandgame")
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
