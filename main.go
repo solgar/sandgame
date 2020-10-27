@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"log"
 	"sandgame/particles"
 	"sandgame/settings"
@@ -29,11 +28,11 @@ type Game struct {
 func (g *Game) Update() error {
 	mx, my := ebiten.CursorPosition()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		particles.GetDataXY(mx, my).PType = particles.Sand
+		(*particles.GetDataXY(mx, my)) = particles.NewSand()
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-		particles.GetDataXY(mx, my).PType = particles.Water
+		(*particles.GetDataXY(mx, my)) = particles.NewWater()
 	}
 
 	for y := settings.ScreenHeight - 1; y >= 0; y-- {
@@ -57,12 +56,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for x := 0; x < settings.ScreenWidth; x++ {
 		for y := settings.ScreenHeight - 1; y >= 0; y-- {
 			particleData := particles.GetDataXY(x, y)
-			switch particleData.PType {
-			case particles.Sand:
-				ebitenutil.DrawRect(screen, float64(x), float64(y), 1, 1, color.RGBA{R: 255, G: 255, B: 0, A: 255})
-			case particles.Water:
-				ebitenutil.DrawRect(screen, float64(x), float64(y), 1, 1, color.RGBA{R: 0, G: 0, B: 255, A: 255})
-			}
+			ebitenutil.DrawRect(screen, float64(x), float64(y), 1, 1, particleData.Color)
 		}
 	}
 

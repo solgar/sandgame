@@ -1,6 +1,7 @@
 package particles
 
 import (
+	"image/color"
 	"math/rand"
 	"sandgame/settings"
 )
@@ -23,6 +24,7 @@ type Particle struct {
 	VelX    float64
 	VelY    float64
 	Updated bool
+	Color   color.RGBA
 }
 
 var oobParticle = &Particle{PType: OOB}
