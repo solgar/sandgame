@@ -28,7 +28,23 @@ type Game struct {
 func (g *Game) Update() error {
 	mx, my := ebiten.CursorPosition()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		(*particles.GetDataXY(mx, my)) = particles.NewSand()
+		if ebiten.IsKeyPressed(ebiten.KeyControl) {
+			(*particles.GetDataXY(mx, my)) = particles.NewWood()
+		} else {
+			(*particles.GetDataXY(mx, my)) = particles.NewSand()
+		}
+	}
+
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && ebiten.IsKeyPressed(ebiten.KeyShift) {
+		(*particles.GetDataXY(mx-1, my-1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx, my-1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx+1, my-1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx-1, my)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx, my)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx+1, my)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx-1, my+1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx, my+1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(mx+1, my+1)) = particles.Particle{PType: particles.Empty}
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
