@@ -17,6 +17,7 @@ const (
 	Smoke
 	Rock
 	Solid
+	Wood
 	OOB
 )
 

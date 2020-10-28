@@ -12,6 +12,10 @@ func randomWaterColor() color.RGBA {
 	return color.RGBA{0, 0, rc, 255}
 }
 
+func randomWoodColor() color.RGBA {
+	return color.RGBA{150, 75, 0, 255}
+}
+
 func NewRock() Particle {
 	max := 150
 	min := 120
@@ -40,4 +44,12 @@ func NewWater() Particle {
 		VelX:    0,
 		VelY:    0,
 		Color:   randomWaterColor()}
+}
+
+func NewWood() Particle {
+	return Particle{PType: Wood,
+		Updated: false,
+		VelX:    0,
+		VelY:    0,
+		Color:   randomWoodColor()}
 }
