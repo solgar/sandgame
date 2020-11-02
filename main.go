@@ -11,14 +11,12 @@ import (
 )
 
 func init() {
-	for x := 0; x < settings.ScreenWidth; x++ {
-		*particles.GetDataXY(x, 0) = particles.NewRock()
-		*particles.GetDataXY(x, settings.ScreenHeight-1) = particles.NewRock()
-	}
+	particles.ClearData()
 
-	for y := 0; y < settings.ScreenHeight; y++ {
-		*particles.GetDataXY(0, y) = particles.NewRock()
-		*particles.GetDataXY(settings.ScreenWidth-1, y) = particles.NewRock()
+	for y := 1; y < settings.ScreenHeight-1; y++ {
+		for x := 1; x < settings.ScreenWidth-1; x++ {
+			*particles.GetDataXY(x, y) = particles.NewSand()
+		}
 	}
 }
 
@@ -56,9 +54,14 @@ func (g *Game) Update() error {
 		(*particles.GetDataXY(particleX, particleY)) = particles.NewWater()
 	}
 
+	if ebiten.IsKeyPressed(ebiten.KeyC) {
+		particles.ClearData()
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		drawStuff = true
 	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
 		drawStuff = false
 	}

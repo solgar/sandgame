@@ -30,6 +30,24 @@ type Particle struct {
 	Color   color.RGBA
 }
 
+func ClearData() {
+	for x := 0; x < settings.ScreenWidth; x++ {
+		for y := 0; y < settings.ScreenHeight; y++ {
+			*GetDataXY(x, y) = NewEmpty()
+		}
+	}
+
+	for x := 0; x < settings.ScreenWidth; x++ {
+		*GetDataXY(x, 0) = NewWood()
+		*GetDataXY(x, settings.ScreenHeight-1) = NewWood()
+	}
+
+	for y := 0; y < settings.ScreenHeight; y++ {
+		*GetDataXY(0, y) = NewWood()
+		*GetDataXY(settings.ScreenWidth-1, y) = NewWood()
+	}
+}
+
 func (p *Particle) IsGas() bool {
 	return p.PType >= Smoke && p.PType <= WaterVapor
 }

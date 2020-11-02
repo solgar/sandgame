@@ -16,6 +16,10 @@ func randomWoodColor() color.RGBA {
 	return color.RGBA{150, 75, 0, 255}
 }
 
+func NewEmpty() Particle {
+	return Particle{PType: Empty}
+}
+
 func NewRock() Particle {
 	max := 150
 	min := 120
