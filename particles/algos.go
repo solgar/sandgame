@@ -10,14 +10,15 @@ type ParticleType uint8
 
 const (
 	Empty = iota
-	Sand
-	Water
-	Fire
-	WaterVapor
 	Smoke
-	Rock
-	Solid
+	WaterVapor
+	Fire
+	Water
+	Acid
+	Oil
 	Wood
+	Sand
+	Rock
 	OOB
 )
 
@@ -27,6 +28,18 @@ type Particle struct {
 	VelY    float64
 	Updated bool
 	Color   color.RGBA
+}
+
+func (p *Particle) IsGas() bool {
+	return p.PType >= Smoke && p.PType <= WaterVapor
+}
+
+func (p *Particle) IsLiquid() bool {
+	return p.PType >= Water && p.PType <= Oil
+}
+
+func (p *Particle) IsSolid() bool {
+	return p.PType >= Wood && p.PType <= Rock
 }
 
 var oobParticle = &Particle{PType: OOB}
