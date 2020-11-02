@@ -25,30 +25,42 @@ func init() {
 type Game struct {
 }
 
+var drawStuff = true
+
 func (g *Game) Update() error {
 	mx, my := ebiten.CursorPosition()
+	particleX := mx / settings.Scale
+	particleY := my / settings.Scale
+
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		if ebiten.IsKeyPressed(ebiten.KeyControl) {
-			(*particles.GetDataXY(mx, my)) = particles.NewWood()
+			(*particles.GetDataXY(particleX, particleY)) = particles.NewWood()
 		} else {
-			(*particles.GetDataXY(mx, my)) = particles.NewSand()
+			(*particles.GetDataXY(particleX, particleY)) = particles.NewSand()
 		}
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && ebiten.IsKeyPressed(ebiten.KeyShift) {
-		(*particles.GetDataXY(mx-1, my-1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx, my-1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx+1, my-1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx-1, my)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx, my)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx+1, my)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx-1, my+1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx, my+1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(mx+1, my+1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX-1, particleY-1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX, particleY-1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX+1, particleY-1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX-1, particleY)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX, particleY)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX+1, particleY)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX-1, particleY+1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX, particleY+1)) = particles.Particle{PType: particles.Empty}
+		(*particles.GetDataXY(particleX+1, particleY+1)) = particles.Particle{PType: particles.Empty}
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-		(*particles.GetDataXY(mx, my)) = particles.NewWater()
+		(*particles.GetDataXY(particleX, particleY)) = particles.NewWater()
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyQ) {
+		drawStuff = true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		drawStuff = false
 	}
 
 	for y := settings.ScreenHeight - 1; y >= 0; y-- {
@@ -69,10 +81,16 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Clear()
 
-	for x := 0; x < settings.ScreenWidth; x++ {
-		for y := settings.ScreenHeight - 1; y >= 0; y-- {
-			particleData := particles.GetDataXY(x, y)
-			ebitenutil.DrawRect(screen, float64(x), float64(y), 1, 1, particleData.Color)
+	if drawStuff {
+		for x := 0; x < settings.ScreenWidth; x++ {
+			for y := settings.ScreenHeight - 1; y >= 0; y-- {
+				particleData := particles.GetDataXY(x, y)
+				if particleData.PType != particles.Empty {
+					px := float64(x * settings.Scale)
+					py := float64(y * settings.Scale)
+					ebitenutil.DrawRect(screen, px, py, settings.Scale, settings.Scale, particleData.Color)
+				}
+			}
 		}
 	}
 
@@ -82,13 +100,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return settings.ScreenWidth, settings.ScreenHeight
+	return settings.ScreenWidth * settings.Scale, settings.ScreenHeight * settings.Scale
 }
 
 func main() {
 	// ebiten.SetMaxTPS(15)
 	ebiten.SetWindowSize(settings.ScreenWidth*settings.Scale, settings.ScreenHeight*settings.Scale)
 	ebiten.SetWindowTitle("sandgame")
+	ebiten.SetFullscreen(true)
+	ebiten.SetVsyncEnabled(true)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}

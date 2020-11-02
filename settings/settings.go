@@ -1,7 +1,8 @@
 package settings
 
 const (
-	ScreenWidth  = 64
-	ScreenHeight = 64
-	Scale        = 15
+	Factor       = 14
+	ScreenWidth  = 1920 / Factor
+	ScreenHeight = 1080 / Factor
+	Scale        = Factor
 )
