@@ -17,7 +17,7 @@ func randomWoodColor() color.RGBA {
 }
 
 func NewEmpty() Particle {
-	return Particle{PType: Empty}
+	return Particle{PType: Empty, Color: color.RGBA{0, 0, 0, 255}}
 }
 
 func NewRock() Particle {

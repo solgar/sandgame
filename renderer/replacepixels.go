@@ -17,23 +17,19 @@ func ReplacePixels(screen *ebiten.Image, data []particles.Particle) {
 
 	const l = settings.ScreenWidth * settings.ScreenHeight
 
-	var ops int
-
 	for x := 0; x < settings.ScreenWidth; x++ {
 		for y := 0; y < settings.ScreenHeight; y++ {
 			particleData := particles.GetDataXY(x, y)
-			if particleData.PType != particles.Empty {
-				for px := x * settings.Scale; px < (x+1)*settings.Scale; px++ {
-					for py := y * settings.Scale; py < (y+1)*settings.Scale; py++ {
-						pxIdx := (px + py*settings.ResolutionWidth) * 4
-						screenBuffer.Pix[pxIdx] = particleData.Color.R
-						screenBuffer.Pix[pxIdx+1] = particleData.Color.G
-						screenBuffer.Pix[pxIdx+2] = particleData.Color.B
-						screenBuffer.Pix[pxIdx+3] = particleData.Color.A
-						ops++
-					}
+			for px := x * settings.Scale; px < (x+1)*settings.Scale; px++ {
+				for py := y * settings.Scale; py < (y+1)*settings.Scale; py++ {
+					pxIdx := (px + py*settings.ResolutionWidth) * 4
+					screenBuffer.Pix[pxIdx] = particleData.Color.R
+					screenBuffer.Pix[pxIdx+1] = particleData.Color.G
+					screenBuffer.Pix[pxIdx+2] = particleData.Color.B
+					screenBuffer.Pix[pxIdx+3] = particleData.Color.A
 				}
 			}
+
 		}
 	}
 

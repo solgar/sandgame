@@ -22,7 +22,7 @@ func init() {
 		}
 	}
 
-	render = renderer.DrawRect
+	render = renderer.ReplacePixels
 }
 
 type Game struct {
@@ -42,7 +42,7 @@ var lastFrameTime *time.Time
 func (g *Game) Update() error {
 	current := time.Now()
 	if lastFrameTime != nil {
-		// fmt.Println("===> whole frame time:", current.Sub(*lastFrameTime))
+		fmt.Println("===> whole frame time:", current.Sub(*lastFrameTime))
 	}
 	lastFrameTime = &current
 
@@ -106,13 +106,13 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// now := time.Now()
+	now := time.Now()
 	for y := settings.ScreenHeight - 1; y >= 0; y-- {
 		for x := 0; x < settings.ScreenWidth; x++ {
 			particles.Update(x, y)
 		}
 	}
-	// fmt.Println("update time:", time.Now().Sub(now))
+	fmt.Println("update time:", time.Now().Sub(now))
 
 	return nil
 }
@@ -121,9 +121,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Clear()
 
 	if drawStuff {
-		// now := time.Now()
+		now := time.Now()
 		render(screen, particles.GetRawData())
-		// fmt.Println("render time:", time.Now().Sub(now))
+		fmt.Println("render time:", time.Now().Sub(now))
 	}
 
 	mx, my := ebiten.CursorPosition()
