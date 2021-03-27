@@ -74,6 +74,10 @@ func IsInBoundsDataXY(x, y int) bool {
 	return x >= 0 && x < settings.ScreenWidth && y >= 0 && y < settings.ScreenHeight
 }
 
+func GetRawData() []Particle {
+	return data
+}
+
 func GetDataXY(x, y int) *Particle {
 	if IsInBoundsDataXY(x, y) {
 		return &data[x+y*settings.ScreenWidth]
@@ -131,20 +135,59 @@ func updateSand(x, y int, p *Particle) {
 	bottomP := GetDataXY(x, y+1)
 	if bottomP.PType == Empty {
 		SwapDataXY(x, y, x, y+1)
-	} else if bottomP.PType != OOB {
-		isBottomLeftEmpty := GetDataXY(x-1, y+1).PType == Empty
-		isBottomRightEmpty := GetDataXY(x+1, y+1).PType == Empty
-		if isBottomLeftEmpty && isBottomRightEmpty {
+	} else if bottomP.IsSolid() {
+		toLD := GetDataXY(x-1, y+1)
+		toRD := GetDataXY(x+1, y+1)
+		if toLD.PType == Empty && toRD.PType == Empty {
 			direction := rand.Int() % 2
 			if direction == 0 {
 				SwapDataXY(x, y, x-1, y+1)
 			} else {
 				SwapDataXY(x, y, x+1, y+1)
 			}
-		} else if isBottomLeftEmpty {
+		} else if toLD.PType == Empty {
 			SwapDataXY(x, y, x-1, y+1)
-		} else if isBottomRightEmpty {
+		} else if toRD.PType == Empty {
 			SwapDataXY(x, y, x+1, y+1)
+		} else if toLD.IsLiquid() && toRD.IsLiquid() {
+			toL := GetDataXY(x-1, y)
+			toR := GetDataXY(x+1, y)
+			if toL.IsLiquid() && toR.IsLiquid() {
+				direction := rand.Int() % 2
+				if direction == 0 {
+					SwapParticles(p, toLD)
+				} else {
+					SwapParticles(p, toRD)
+				}
+			}
+		}
+	} else if bottomP.IsLiquid() {
+		toL := GetDataXY(x-1, y)
+		toR := GetDataXY(x+1, y)
+		direction := rand.Int() % 2
+		if toL.IsLiquid() || toR.IsLiquid() {
+			toLD := GetDataXY(x-1, y+1)
+			toRD := GetDataXY(x+1, y+1)
+			direction := rand.Int() % 3
+			if direction == 0 && toLD.IsLiquid() {
+				SwapParticles(p, toLD)
+			} else if direction == 1 && toRD.IsLiquid() {
+				SwapParticles(p, toRD)
+			} else {
+				SwapParticles(p, bottomP)
+			}
+		} else if direction == 0 && toL.PType == Empty {
+			*toL = *bottomP
+			*bottomP = *p
+			*p = NewEmpty()
+		} else if toR.PType == Empty {
+			*toR = *bottomP
+			*bottomP = *p
+			*p = NewEmpty()
+		} else {
+			// *bottomP = *p
+			// *p = NewEmpty()
+			SwapParticles(p, bottomP)
 		}
 	}
 }

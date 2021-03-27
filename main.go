@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"sandgame/brush"
 	"sandgame/particles"
+	"sandgame/renderer"
 	"sandgame/settings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -18,6 +21,8 @@ func init() {
 			*particles.GetDataXY(x, y) = particles.NewSand()
 		}
 	}
+
+	render = renderer.DrawRect
 }
 
 type Game struct {
@@ -25,33 +30,62 @@ type Game struct {
 
 var drawStuff = true
 
+var currentBrush = brush.NewDotBrush()
+
+var plusPressed = false
+var minusPressed = false
+
+var render renderer.Renderer
+
+var lastFrameTime *time.Time
+
 func (g *Game) Update() error {
+	current := time.Now()
+	if lastFrameTime != nil {
+		// fmt.Println("===> whole frame time:", current.Sub(*lastFrameTime))
+	}
+	lastFrameTime = &current
+
 	mx, my := ebiten.CursorPosition()
 	particleX := mx / settings.Scale
 	particleY := my / settings.Scale
 
+	_, why := ebiten.Wheel()
+
+	if why > 0 {
+		s := currentBrush.GetSize()
+		currentBrush.SetSize(s + 1)
+	} else if why < 0 {
+		s := currentBrush.GetSize()
+		currentBrush.SetSize(s - 1)
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyKPAdd) && !plusPressed {
+		s := currentBrush.GetSize()
+		currentBrush.SetSize(s + 1)
+	}
+	plusPressed = ebiten.IsKeyPressed(ebiten.KeyKPAdd)
+
+	if ebiten.IsKeyPressed(ebiten.KeyKPSubtract) && !minusPressed {
+		s := currentBrush.GetSize()
+		currentBrush.SetSize(s - 1)
+	}
+	minusPressed = ebiten.IsKeyPressed(ebiten.KeyKPSubtract)
+
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		if ebiten.IsKeyPressed(ebiten.KeyControl) {
-			(*particles.GetDataXY(particleX, particleY)) = particles.NewWood()
+			currentBrush.PaintType(particleX, particleY, particles.Wood)
 		} else {
-			(*particles.GetDataXY(particleX, particleY)) = particles.NewSand()
+			currentBrush.PaintType(particleX, particleY, particles.Sand)
 		}
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && ebiten.IsKeyPressed(ebiten.KeyShift) {
-		(*particles.GetDataXY(particleX-1, particleY-1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX, particleY-1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX+1, particleY-1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX-1, particleY)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX, particleY)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX+1, particleY)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX-1, particleY+1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX, particleY+1)) = particles.Particle{PType: particles.Empty}
-		(*particles.GetDataXY(particleX+1, particleY+1)) = particles.Particle{PType: particles.Empty}
+		currentBrush.PaintType(particleX, particleY, particles.Empty)
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-		(*particles.GetDataXY(particleX, particleY)) = particles.NewWater()
+		currentBrush.PaintType(particleX, particleY, particles.Water)
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyC) {
@@ -72,11 +106,13 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// now := time.Now()
 	for y := settings.ScreenHeight - 1; y >= 0; y-- {
 		for x := 0; x < settings.ScreenWidth; x++ {
 			particles.Update(x, y)
 		}
 	}
+	// fmt.Println("update time:", time.Now().Sub(now))
 
 	return nil
 }
@@ -85,20 +121,20 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Clear()
 
 	if drawStuff {
-		for x := 0; x < settings.ScreenWidth; x++ {
-			for y := settings.ScreenHeight - 1; y >= 0; y-- {
-				particleData := particles.GetDataXY(x, y)
-				if particleData.PType != particles.Empty {
-					px := float64(x * settings.Scale)
-					py := float64(y * settings.Scale)
-					ebitenutil.DrawRect(screen, px, py, settings.Scale, settings.Scale, particleData.Color)
-				}
-			}
-		}
+		// now := time.Now()
+		render(screen, particles.GetRawData())
+		// fmt.Println("render time:", time.Now().Sub(now))
 	}
 
 	mx, my := ebiten.CursorPosition()
-	msg := fmt.Sprintf("(%d, %d)", mx, my)
+	particleX := float64(mx / settings.Scale)
+	particleY := float64(my / settings.Scale)
+	particlePx := int(particleX * settings.Scale)
+	particlePy := int(particleY * settings.Scale)
+
+	currentBrush.DrawOutline(screen, particlePx, particlePy)
+
+	msg := fmt.Sprintf("(%d, %d)  FPS: %d", int(particleX), int(particleY), int(ebiten.CurrentFPS()))
 	ebitenutil.DebugPrint(screen, msg)
 }
 
@@ -111,7 +147,8 @@ func main() {
 	ebiten.SetWindowSize(settings.ScreenWidth*settings.Scale, settings.ScreenHeight*settings.Scale)
 	ebiten.SetWindowTitle("sandgame")
 	ebiten.SetFullscreen(true)
-	ebiten.SetVsyncEnabled(true)
+	ebiten.SetVsyncEnabled(false)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
