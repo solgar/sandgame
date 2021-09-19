@@ -1,34 +1,9 @@
 package particles
 
 import (
-	"image/color"
 	"math/rand"
 	"sandgame/settings"
 )
-
-type ParticleType uint8
-
-const (
-	Empty = iota
-	Smoke
-	WaterVapor
-	Fire
-	Water
-	Acid
-	Oil
-	Wood
-	Sand
-	Rock
-	OOB
-)
-
-type Particle struct {
-	PType   ParticleType
-	VelX    float64
-	VelY    float64
-	Updated bool
-	Color   color.RGBA
-}
 
 func ClearData() {
 	for x := 0; x < settings.ScreenWidth; x++ {
@@ -46,18 +21,6 @@ func ClearData() {
 		*GetDataXY(0, y) = NewWood()
 		*GetDataXY(settings.ScreenWidth-1, y) = NewWood()
 	}
-}
-
-func (p *Particle) IsGas() bool {
-	return p.PType >= Smoke && p.PType <= WaterVapor
-}
-
-func (p *Particle) IsLiquid() bool {
-	return p.PType >= Water && p.PType <= Oil
-}
-
-func (p *Particle) IsSolid() bool {
-	return p.PType >= Wood && p.PType <= Rock
 }
 
 var oobParticle = &Particle{PType: OOB}
